@@ -1,4 +1,3 @@
-/* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
 const User = require('../models/user');
 
 module.exports.getUsers = (req, res) => {
