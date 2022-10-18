@@ -19,7 +19,6 @@ app.use((req, res, next) => {
 });
 app.use(users, cards);
 app.use('*', (req, res) => {
-  console.log(req.originalUrl);
   res.status(NOT_FOUND).send({ message: 'По указанному пути ничего не найдено' });
 });
 app.listen(PORT, () => {
