@@ -9,14 +9,9 @@ const {
 } = require('../utils/errors');
 
 module.exports.getCards = (req, res) => {
-  Card.find({}).orFail().populate('owner')
+  Card.find({}).populate('owner')
     .then((cards) => res.status(OK).send({ data: cards }))
-    .catch((err) => {
-      if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        return res.status(NOT_FOUND).send({ message: `Карточки не найдены. ${err.message}` });
-      }
-      return res.status(INTERNAL_SERVER).send({ message: `Произошла ошибка на сервере. ${err.message}` });
-    });
+    .catch((err) => res.status(INTERNAL_SERVER).send({ message: `Произошла ошибка на сервере. ${err.message}` }));
 };
 
 module.exports.createCard = (req, res) => {
