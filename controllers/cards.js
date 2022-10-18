@@ -41,13 +41,7 @@ module.exports.createCard = (req, res) => {
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId).orFail()
     .then((card) => {
-      Card.findById(req.params.cardId).orFail()
-        .then(() => res.status(INTERNAL_SERVER).send({ message: `Произошла ошибка на сервере. Карточка _id:${card._id} не была удалена` }))
-        .catch((err) => {
-          if (err instanceof mongoose.Error.DocumentNotFoundError) {
-            res.status(OK).send({ message: `Карточка _id:${card._id} удалена` });
-          }
-        });
+      res.status(OK).send({ message: `Карточка _id:${card._id} удалена` });
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError
