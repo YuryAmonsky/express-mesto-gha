@@ -9,14 +9,9 @@ const {
 } = require('../utils/errors');
 
 module.exports.getUsers = (req, res) => {
-  User.find({}).orFail()
+  User.find({})
     .then((users) => res.status(OK).send({ data: users }))
-    .catch((err) => {
-      if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        return res.status(NOT_FOUND).send({ message: `Пользователи не найдены. ${err.message}` });
-      }
-      return res.status(INTERNAL_SERVER).send({ message: `Произошла ошибка на сервере. ${err.message}` });
-    });
+    .catch(() => res.status(INTERNAL_SERVER).send({ message: 'Произошла ошибка на сервере.' }));
 };
 
 module.exports.getUser = (req, res) => {
@@ -26,13 +21,10 @@ module.exports.getUser = (req, res) => {
       if (err instanceof mongoose.Error.CastError) {
         return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные пользователя. Формат Id пользователя не верный' });
       }
-      if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(BAD_REQUEST).send({ message: `Переданы некорректные данные пользователя. ${err.message}` });
-      }
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        return res.status(NOT_FOUND).send({ message: `Пользователь с id:${req.params.userId} не найден. ${err.message}` });
+        return res.status(NOT_FOUND).send({ message: `Пользователь с id:${req.params._id} не найден` });
       }
-      return res.status(INTERNAL_SERVER).send({ message: `Произошла ошибка на сервере. ${err.message}` });
+      return res.status(INTERNAL_SERVER).send({ message: 'Произошла ошибка на сервере.' });
     });
 };
 
@@ -41,11 +33,10 @@ module.exports.createUser = (req, res) => {
   User.create({ name, about, avatar })
     .then((user) => res.status(OK).send({ data: user }))
     .catch((err) => {
-      if (err instanceof mongoose.Error.CastError
-        || err instanceof mongoose.Error.ValidationError) {
-        return res.status(BAD_REQUEST).send({ message: `Переданы некорректные данные пользователя. ${err.message}` });
+      if (err instanceof mongoose.Error.ValidationError) {
+        return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные пользователя.' });
       }
-      return res.status(INTERNAL_SERVER).send({ message: `Произошла ошибка на сервере. ${err.message}` });
+      return res.status(INTERNAL_SERVER).send({ message: 'Произошла ошибка на сервере.' });
     });
 };
 
@@ -56,12 +47,12 @@ module.exports.updateUserInfo = (req, res) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError
         || err instanceof mongoose.Error.ValidationError) {
-        return res.status(BAD_REQUEST).send({ message: `Переданы некорректные данные пользователя. ${err.message}` });
+        return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные пользователя.' });
       }
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        return res.status(NOT_FOUND).send({ message: `Пользователь с id:${req.params._id} не найден` });
+        return res.status(NOT_FOUND).send({ message: `Пользователь с id:${req.user._id} не найден` });
       }
-      return res.status(INTERNAL_SERVER).send({ message: `Произошла ошибка на сервере. ${err.message}` });
+      return res.status(INTERNAL_SERVER).send({ message: 'Произошла ошибка на сервере.' });
     });
 };
 
@@ -72,11 +63,11 @@ module.exports.updateUserAvatar = (req, res) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError
         || err instanceof mongoose.Error.ValidationError) {
-        return res.status(BAD_REQUEST).send({ message: `Переданы некорректные данные пользователя. ${err.message}` });
+        return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные пользователя.' });
       }
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        return res.status(NOT_FOUND).send({ message: `Пользователь с id:${req.params._id} не найден` });
+        return res.status(NOT_FOUND).send({ message: `Пользователь с id:${req.user._id} не найден` });
       }
-      return res.status(INTERNAL_SERVER).send({ message: `Произошла ошибка на сервере. ${err.message}` });
+      return res.status(INTERNAL_SERVER).send({ message: 'Произошла ошибка на сервере.' });
     });
 };

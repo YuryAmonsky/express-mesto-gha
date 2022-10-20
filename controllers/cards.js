@@ -25,8 +25,7 @@ module.exports.createCard = (req, res) => {
         .catch((err) => res.status(INTERNAL_SERVER).send({ message: `Произошла ошибка на сервере. ${err.message}` }));
     })
     .catch((err) => {
-      if (err instanceof mongoose.Error.CastError
-        || err instanceof mongoose.Error.ValidationError) {
+      if (err instanceof mongoose.Error.ValidationError) {
         return res.status(BAD_REQUEST).send({ message: `Переданы некорректные данные карточки. ${err.message}` });
       }
       return res.status(INTERNAL_SERVER).send({ message: `Произошла ошибка на сервере. ${err.message}` });
@@ -39,14 +38,13 @@ module.exports.deleteCard = (req, res) => {
       res.status(OK).send({ message: `Карточка _id:${card._id} удалена` });
     })
     .catch((err) => {
-      if (err instanceof mongoose.Error.CastError
-        || err instanceof mongoose.Error.ValidationError) {
-        return res.status(BAD_REQUEST).send({ message: `Переданы некорректные данные карточки. ${err.message}` });
+      if (err instanceof mongoose.Error.CastError) {
+        return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные карточки.' });
       }
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        return res.status(NOT_FOUND).send({ message: `Не найдена карточка с указанным _id. ${err.message}` });
+        return res.status(NOT_FOUND).send({ message: 'Не найдена карточка с указанным _id.' });
       }
-      return res.status(INTERNAL_SERVER).send({ message: `Произошла ошибка на сервере. ${err.message}` });
+      return res.status(INTERNAL_SERVER).send({ message: 'Произошла ошибка на сервере.' });
     });
 };
 
@@ -60,14 +58,13 @@ module.exports.likeCard = (req, res) => {
     .populate(['owner', 'likes'])
     .then((card) => res.status(OK).send({ data: card }))
     .catch((err) => {
-      if (err instanceof mongoose.Error.CastError
-        || err instanceof mongoose.Error.ValidationError) {
-        return res.status(BAD_REQUEST).send({ message: `Переданы некорректные данные карточки. ${err.message}` });
+      if (err instanceof mongoose.Error.CastError) {
+        return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные карточки.' });
       }
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        return res.status(NOT_FOUND).send({ message: `Не найдена карточка с указанным _id. ${err.message}` });
+        return res.status(NOT_FOUND).send({ message: 'Не найдена карточка с указанным _id.' });
       }
-      return res.status(INTERNAL_SERVER).send({ message: `Произошла ошибка на сервере. ${err.message}` });
+      return res.status(INTERNAL_SERVER).send({ message: 'Произошла ошибка на сервере.' });
     });
 };
 
@@ -81,13 +78,12 @@ module.exports.dislikeCard = (req, res) => {
     .populate(['owner', 'likes'])
     .then((card) => res.status(OK).send({ data: card }))
     .catch((err) => {
-      if (err instanceof mongoose.Error.CastError
-        || err instanceof mongoose.Error.ValidationError) {
-        return res.status(BAD_REQUEST).send({ message: `Переданы некорректные данные карточки. ${err.message}` });
+      if (err instanceof mongoose.Error.CastError) {
+        return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные карточки.' });
       }
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        return res.status(NOT_FOUND).send({ message: `Не найдена карточка с указанным _id. ${err.message}` });
+        return res.status(NOT_FOUND).send({ message: 'Не найдена карточка с указанным _id.' });
       }
-      return res.status(INTERNAL_SERVER).send({ message: `Произошла ошибка на сервере. ${err.message}` });
+      return res.status(INTERNAL_SERVER).send({ message: 'Произошла ошибка на сервере.' });
     });
 };
