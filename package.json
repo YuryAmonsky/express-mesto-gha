@@ -4,7 +4,7 @@
   "description": "backend of the project \"Mesto\"",
   "main": "app.js",
   "scripts": {
-    "start": "node --inspect app.js",
+    "start": "node app.js",
     "dev": "nodemon --inspect app.js",
     "lint": "npx eslint ."
   },
