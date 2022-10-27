@@ -34,14 +34,21 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUser = (req, res) => {
-  User.findById(req.params.userId).orFail()
+  /* чтобы не дублировать контроллер для получения данных
+  текущего пользователя добавляю проверку на наличие в запросе
+  params.userID */
+  let userId;
+  if (req.params.userId) userId = req.params.userId;
+  else userId = req.user._id;
+  // User.findById(req.params.userId).orFail()
+  User.findById(userId).orFail()
     .then((user) => res.status(OK).send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
         return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные пользователя. Формат Id пользователя не верный' });
       }
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        return res.status(NOT_FOUND).send({ message: `Пользователь с id:${req.params._id} не найден` });
+        return res.status(NOT_FOUND).send({ message: `Пользователь с id:${userId} не найден` });
       }
       return res.status(INTERNAL_SERVER).send({ message: 'Произошла ошибка на сервере.' });
     });

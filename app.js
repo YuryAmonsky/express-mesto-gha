@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { login, createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
 const users = require('./routes/users');
 const cards = require('./routes/cards');
 const { NOT_FOUND } = require('./utils/errors');
@@ -20,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 }); */
 app.post('/signin', login);
 app.post('/signup', createUser);
-app.use(users, cards);
+app.use(auth, users, cards);
 app.use('*', (req, res) => {
   res.status(NOT_FOUND).send({ message: 'По указанному пути ничего не найдено' });
 });
