@@ -3,11 +3,13 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const { SECRETKEY } = require('../middlewares/auth');
 const {
   OK,
   BAD_REQUEST,
   NOT_FOUND,
   UNAUTHORIZED,
+  CONFLICT,
   INTERNAL_SERVER,
 } = require('../utils/errors');
 
@@ -15,12 +17,12 @@ module.exports.login = (req, res) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'aj3h4bng9f9g8bspa0fk', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, SECRETKEY, { expiresIn: '7d' });
       res.status(OK).send({ token });
     })
     .catch((err) => {
       console.log(err.name);
-      if (err instanceof mongoose.Error.DocumentNotFoundError || err.name === 'NOTAUTHORIZED') {
+      if (err instanceof mongoose.Error.DocumentNotFoundError || err.name === 'UNAUTHORIZED') {
         return res.status(UNAUTHORIZED).send({ message: err.message });
       }
       return res.status(INTERNAL_SERVER).send({ message: 'Произошла ошибка на сервере.' });
@@ -67,6 +69,9 @@ module.exports.createUser = (req, res) => {
       console.log(err);
       if (err instanceof mongoose.Error.ValidationError) {
         return res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные пользователя.' });
+      }
+      if (err.code === 11000) {
+        return res.status(CONFLICT).send({ message: 'Пользователь с таким email уже зарегистрирован' });
       }
       return res.status(INTERNAL_SERVER).send({ message: 'Произошла ошибка на сервере.' });
     });
