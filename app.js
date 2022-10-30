@@ -19,8 +19,8 @@ app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().email().required(),
     password: Joi.string().required(),
-    name: Joi.string().min(2).max(30).default('Жак-Ив Кусто'),
-    about: Joi.string().min(2).max(30).default('Исследователь'),
+    name: Joi.string().default('Жак-Ив Кусто').min(2).max(30),
+    about: Joi.string().default('Исследователь').min(2).max(30),
     avatar: Joi.string().regex(/^https?:\/\/(?:w{3}\.)*\S*#?$/i)
       .default('https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png'),
   }),
@@ -29,8 +29,8 @@ app.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().email().required(),
     password: Joi.string().required(),
-    name: Joi.string().min(2).max(30).default('Жак-Ив Кусто'),
-    about: Joi.string().min(2).max(30).default('Исследователь'),
+    name: Joi.string().default('Жак-Ив Кусто').min(2).max(30),
+    about: Joi.string().default('Исследователь').min(2).max(30),
     avatar: Joi.string().regex(/^https?:\/\/(?:w{3}\.)*\S*#?$/i)
       .default('https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png'),
   }),
