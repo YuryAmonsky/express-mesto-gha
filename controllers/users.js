@@ -39,14 +39,21 @@ module.exports.getUser = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
-  const {
-    name, about, avatar, email, password,
-  } = req.body;
-  bcrypt.hash(password, 10)
+  bcrypt.hash(req.body.password, 10)
     .then((hash) => User.create({
-      name, about, avatar, email, password: hash,
+      ...req.body, password: hash,
     }))
-    .then((user) => res.status(OK).send({ data: user }))
+    .then(({
+      name, about, avatar, email, _id, createdAt,
+    }) => {
+      res.status(OK).send(
+        {
+          data: {
+            name, about, avatar, email, _id, createdAt,
+          },
+        },
+      );
+    })
     .catch((err) => {
       if (err.code === 11000) {
         const customError = new ConflictError('Пользователь с указанным email уже зарегистрирован');
