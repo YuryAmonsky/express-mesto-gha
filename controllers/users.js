@@ -41,7 +41,7 @@ module.exports.getUser = (req, res, next) => {
     .then((user) => res.status(OK).send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        next(new BadRequestError('Переданы некорректные данные карточки'));
+        next(new BadRequestError('Переданы некорректные данные пользователя'));
       } else {
         next(new InternalServerError('Произошла ошибка на сервере.'));
       }
@@ -65,11 +65,12 @@ module.exports.createUser = (req, res, next) => {
       );
     })
     .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        return next(new BadRequestError('Переданы некорректные данные карточки'));
-      }
       if (err.code === 11000) {
         return next(new ConflictError('Пользователь с указанным email уже зарегистрирован'));
+      }
+      if (err instanceof mongoose.Error.ValidationError) {
+        console.log(err);
+        return next(new BadRequestError('Переданы некорректные данные пользователя'));
       }
       return next(new InternalServerError('Произошла ошибка на сервере.'));
     });
@@ -82,7 +83,7 @@ module.exports.updateUserInfo = (req, res, next) => {
     .then((user) => res.status(OK).send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        return next(new BadRequestError('Переданы некорректные данные карточки'));
+        return next(new BadRequestError('Переданы некорректные данные пользователя'));
       }
       return next(new InternalServerError('Произошла ошибка на сервере.'));
     });
@@ -95,7 +96,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
     .then((user) => res.status(OK).send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        return next(new BadRequestError('Переданы некорректные данные карточки'));
+        return next(new BadRequestError('Переданы некорректные данные пользователя'));
       }
       return next(new InternalServerError('Произошла ошибка на сервере.'));
     });

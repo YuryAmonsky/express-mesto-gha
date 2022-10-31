@@ -9,7 +9,7 @@ const users = require('./routes/users');
 const cards = require('./routes/cards');
 const NotFoundError = require('./utils/errors/not-found-error');
 const handleError = require('./middlewares/handleError');
-const URL_PATTERN = require('./utils/constants');
+const { URL_PATTERN } = require('./utils/constants');
 
 const app = express();
 const { PORT = 3000 } = process.env;
