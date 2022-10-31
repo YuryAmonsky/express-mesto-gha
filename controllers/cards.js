@@ -23,10 +23,9 @@ module.exports.createCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        next(new BadRequestError('Переданы некорректные данные карточки'));
-      } else {
-        next(new InternalServerError('Произошла ошибка на сервере.'));
+        return next(new BadRequestError('Переданы некорректные данные карточки'));
       }
+      return next(new InternalServerError('Произошла ошибка на сервере.'));
     });
 };
 
@@ -35,18 +34,19 @@ module.exports.deleteCard = (req, res, next) => {
     .orFail(new NotFoundError('Не найдена карточка с указанным _id.'))
     .then((cardDoc) => {
       if (req.user._id !== cardDoc.owner.toString()) {
-        const err = new ForbidenError('Нельзя удалять чужую карточку');
-        return Promise.reject(err);
+        return next(new ForbidenError('Нельзя удалять чужую карточку'));
       }
       return Card.findByIdAndRemove(req.params.cardId);
     })
     .then((card) => res.status(OK).send({ message: `Карточка _id:${card._id} удалена` }))
     .catch((err) => {
-      if (err instanceof mongoose.Error.CastError) {
-        next(new BadRequestError('Переданы некорректные данные карточки'));
-      } else {
-        next(new InternalServerError('Произошла ошибка на сервере.'));
+      if (err instanceof NotFoundError) {
+        return next(err);
       }
+      if (err instanceof mongoose.Error.CastError) {
+        return next(new BadRequestError('Переданы некорректные данные карточки'));
+      }
+      return next(new InternalServerError('Произошла ошибка на сервере.'));
     });
 };
 
@@ -59,11 +59,13 @@ module.exports.likeCard = (req, res, next) => {
     .orFail(new NotFoundError('Не найдена карточка с указанным _id.'))
     .then((card) => res.status(OK).send({ data: card }))
     .catch((err) => {
-      if (err instanceof mongoose.Error.CastError) {
-        next(new BadRequestError('Переданы некорректные данные карточки'));
-      } else {
-        next(new InternalServerError('Произошла ошибка на сервере.'));
+      if (err instanceof NotFoundError) {
+        return next(err);
       }
+      if (err instanceof mongoose.Error.CastError) {
+        return next(new BadRequestError('Переданы некорректные данные карточки'));
+      }
+      return next(new InternalServerError('Произошла ошибка на сервере.'));
     });
 };
 
@@ -76,10 +78,12 @@ module.exports.dislikeCard = (req, res, next) => {
     .orFail(new NotFoundError('Не найдена карточка с указанным _id.'))
     .then((card) => res.status(OK).send({ data: card }))
     .catch((err) => {
-      if (err instanceof mongoose.Error.CastError) {
-        next(new BadRequestError('Переданы некорректные данные карточки'));
-      } else {
-        next(new InternalServerError('Произошла ошибка на сервере.'));
+      if (err instanceof NotFoundError) {
+        return next(err);
       }
+      if (err instanceof mongoose.Error.CastError) {
+        return next(new BadRequestError('Переданы некорректные данные карточки'));
+      }
+      return next(new InternalServerError('Произошла ошибка на сервере.'));
     });
 };

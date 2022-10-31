@@ -40,11 +40,13 @@ module.exports.getUser = (req, res, next) => {
   User.findById(userId).orFail(new NotFoundError(`Пользователь с id:${userId} не найден`))
     .then((user) => res.status(OK).send({ data: user }))
     .catch((err) => {
-      if (err instanceof mongoose.Error.CastError) {
-        next(new BadRequestError('Переданы некорректные данные пользователя'));
-      } else {
-        next(new InternalServerError('Произошла ошибка на сервере.'));
+      if (err instanceof NotFoundError) {
+        return next(err);
       }
+      if (err instanceof mongoose.Error.CastError) {
+        return next(new BadRequestError('Переданы некорректные данные пользователя'));
+      }
+      return next(new InternalServerError('Произошла ошибка на сервере.'));
     });
 };
 
@@ -69,7 +71,6 @@ module.exports.createUser = (req, res, next) => {
         return next(new ConflictError('Пользователь с указанным email уже зарегистрирован'));
       }
       if (err instanceof mongoose.Error.ValidationError) {
-        console.log(err);
         return next(new BadRequestError('Переданы некорректные данные пользователя'));
       }
       return next(new InternalServerError('Произошла ошибка на сервере.'));
@@ -82,6 +83,9 @@ module.exports.updateUserInfo = (req, res, next) => {
     .orFail(new NotFoundError(`Пользователь с id:${req.user._id} не найден`))
     .then((user) => res.status(OK).send({ data: user }))
     .catch((err) => {
+      if (err instanceof NotFoundError) {
+        return next(err);
+      }
       if (err instanceof mongoose.Error.ValidationError) {
         return next(new BadRequestError('Переданы некорректные данные пользователя'));
       }
@@ -95,6 +99,9 @@ module.exports.updateUserAvatar = (req, res, next) => {
     .orFail(new NotFoundError(`Пользователь с id:${req.user._id} не найден`))
     .then((user) => res.status(OK).send({ data: user }))
     .catch((err) => {
+      if (err instanceof NotFoundError) {
+        return next(err);
+      }
       if (err instanceof mongoose.Error.ValidationError) {
         return next(new BadRequestError('Переданы некорректные данные пользователя'));
       }
