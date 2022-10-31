@@ -1,11 +1,15 @@
 /* eslint no-console: ["error", { allow: ["log"] }] */
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { SECRETKEY } = require('../middlewares/auth');
-const NotFoundError = require('../utils/errors/not-found-error');
-const ConflictError = require('../utils/errors/conflict-errror');
-const InternalServerError = require('../utils/errors/internal-server-error');
+const {
+  BadRequestError,
+  NotFoundError,
+  ConflictError,
+  InternalServerError,
+} = require('../utils/errors/index');
 const {
   OK,
 } = require('../utils/constants');
@@ -35,7 +39,13 @@ module.exports.getUser = (req, res, next) => {
   else userId = req.user._id;
   User.findById(userId).orFail(new NotFoundError(`Пользователь с id:${userId} не найден`))
     .then((user) => res.status(OK).send({ data: user }))
-    .catch(next);
+    .catch((err) => {
+      if (err instanceof mongoose.Error.CastError) {
+        next(new BadRequestError('Переданы некорректные данные карточки'));
+      } else {
+        next(new InternalServerError('Произошла ошибка на сервере.'));
+      }
+    });
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -55,12 +65,13 @@ module.exports.createUser = (req, res, next) => {
       );
     })
     .catch((err) => {
-      if (err.code === 11000) {
-        const customError = new ConflictError('Пользователь с указанным email уже зарегистрирован');
-        next(customError);
+      if (err instanceof mongoose.Error.ValidationError) {
+        return next(new BadRequestError('Переданы некорректные данные карточки'));
       }
-      const customError = new InternalServerError('Произошла ошибка на сервере.');
-      next(customError);
+      if (err.code === 11000) {
+        return next(new ConflictError('Пользователь с указанным email уже зарегистрирован'));
+      }
+      return next(new InternalServerError('Произошла ошибка на сервере.'));
     });
 };
 
@@ -69,7 +80,12 @@ module.exports.updateUserInfo = (req, res, next) => {
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true })
     .orFail(new NotFoundError(`Пользователь с id:${req.user._id} не найден`))
     .then((user) => res.status(OK).send({ data: user }))
-    .catch(next);
+    .catch((err) => {
+      if (err instanceof mongoose.Error.ValidationError) {
+        return next(new BadRequestError('Переданы некорректные данные карточки'));
+      }
+      return next(new InternalServerError('Произошла ошибка на сервере.'));
+    });
 };
 
 module.exports.updateUserAvatar = (req, res, next) => {
@@ -77,5 +93,10 @@ module.exports.updateUserAvatar = (req, res, next) => {
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true })
     .orFail(new NotFoundError(`Пользователь с id:${req.user._id} не найден`))
     .then((user) => res.status(OK).send({ data: user }))
-    .catch(next);
+    .catch((err) => {
+      if (err instanceof mongoose.Error.ValidationError) {
+        return next(new BadRequestError('Переданы некорректные данные карточки'));
+      }
+      return next(new InternalServerError('Произошла ошибка на сервере.'));
+    });
 };
