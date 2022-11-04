@@ -33,7 +33,10 @@ Mesto - это фотохостинг, отображающий пользова
 #### Запуск проекта
 
 `npm run start` — запускает сервер   
-`npm run dev` — запускает сервер с hot-reload
+`npm run dev` — запускает сервер с hot-reload  
+
+ Для запуска сервера базы данных смотрите документацию к MongoDB  
+ [https://www.mongodb.com/docs/](https://www.mongodb.com/docs/)
 
 #### Используемые технологии и инструменты  
   Node.js (v16.15.1)  
